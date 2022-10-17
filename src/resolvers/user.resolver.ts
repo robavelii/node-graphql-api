@@ -1,6 +1,7 @@
-import { Arg, Mutation, Query, Resolver } from "type-graphql";
-import { User, CreateUserInput } from '../schema/user.schema';
+import { Arg, Mutation, Query, Resolver, Ctx, } from "type-graphql";
+import { User, CreateUserInput, LoginInput } from '../schema/user.schema';
 import UserService from '../service/user.service';
+import Context from "../types/context";
 
 @Resolver()
 export default class UserResolver{
@@ -13,12 +14,13 @@ export default class UserResolver{
         return this.userService.createUser(input);
     }
 
+    @Mutation(()=> String) //Returns the JWT
+    login(@Arg('input') input: LoginInput, @Ctx() context: Context){
+        return this.userService.login(input, context);
+    }
+
     @Query(()=> User)
-    me(){
-        return{
-            _id: "123",
-            name: "John Wick",
-            email: "johnwick"
-        };
+    me( @Ctx() context: Context){
+        return context.user;
     }
 }
